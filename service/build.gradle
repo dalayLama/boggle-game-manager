@@ -1,0 +1,37 @@
+group = 'com.playhub.boggle'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    annotationProcessor 'org.mapstruct:mapstruct-processor'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
+    implementation 'org.postgresql:postgresql'
+    implementation 'org.mapstruct:mapstruct'
+    implementation 'com.playhub.common:playhub-logger-starter'
+    implementation 'com.playhub.common:playhub-rest-security-starter'
+    implementation 'com.playhub.common:playhub-web-error-management-starter'
+    implementation project(':rest-dto')
+    implementation project(':kafka-dto')
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.apache.commons:commons-lang3'
+
+    testImplementation 'com.jimbeam:common-utils'
+
+    integrationTestImplementation 'org.springframework.security:spring-security-test'
+    integrationTestImplementation 'com.jimbeam:common-utils'
+    integrationTestImplementation 'com.jimbeam:spring-jpa-utils'
+    integrationTestImplementation 'com.jimbeam:postgres-testcontainer'
+    integrationTestImplementation 'com.jimbeam:kafka-testcontainer'
+    integrationTestImplementation 'com.jimbeam:spring-liquibase'
+
+    testFixturesImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    testFixturesImplementation 'com.fasterxml.jackson.core:jackson-core'
+    testFixturesImplementation 'com.fasterxml.jackson.core:jackson-databind'
+    testFixturesImplementation 'com.fasterxml.jackson.core:jackson-annotations'
+    testFixturesImplementation 'com.jimbeam:common-utils'
+    testFixturesImplementation project(':rest-dto')
+    testFixturesImplementation project(':kafka-dto')
+}

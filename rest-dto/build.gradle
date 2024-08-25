@@ -1,0 +1,36 @@
+apply plugin: 'maven-publish'
+apply plugin: 'java-library'
+
+group = 'com.playhub.boggle'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework:spring-web'
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "Boggle-Game-Manager"
+            url = uri("https://maven.pkg.github.com/dalayLama/boggle-game-manager")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,162 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.1'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id 'idea'
+    id 'java-test-fixtures'
+    id 'maven-publish'
+    id 'java-library'
+}
+
+idea {
+    project {
+        languageLevel = 17
+    }
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+group = 'com.playhub.boggle'
+version = '0.0.1-SNAPSHOT'
+
+ext {
+    bomVersions = [
+            springBoot: "3.2.5",
+            springCloud: "2022.0.3"
+    ]
+    libVersions = [
+            mapstruct: "1.5.5.Final",
+            playhubSecurityStarter: "0.0.1-SNAPSHOT",
+            jimBeamCommonUtils: "0.0.1-SNAPSHOT",
+            jimBeamJpaUtils: "0.0.1-SNAPSHOT",
+            jimBeamPostgresContainer: "0.0.1-SNAPSHOT",
+            jimBeamKafkaContainer: "0.0.1-SNAPSHOT",
+            jimBemSpringLiquibase: "0.0.1-SNAPSHOT",
+            playhubWebErrorManagementStarter: "0.0.1-SNAPSHOT",
+            playhubCommon: "0.0.1-SNAPSHOT",
+            playhubLoggerStarter: "0.0.1-SNAPSHOT",
+            springDocOpenApi: "2.0.2"
+    ]
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'idea'
+    apply plugin: 'java-test-fixtures'
+
+    sourceSets {
+        integrationTest {
+            java.srcDir 'src/integrationTest/java'
+            resources.srcDir 'src/integrationTest/resources'
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+    }
+
+    idea {
+        module {
+            testSourceDirs += project.sourceSets.integrationTest.java.srcDirs
+            testSourceDirs += project.sourceSets.integrationTest.resources.srcDirs
+        }
+    }
+
+    configurations {
+        integrationTestImplementation.extendsFrom testImplementation
+        integrationTestRuntime.extendsFrom testRuntime
+    }
+
+    task integrationTest(type: Test) {
+        useJUnitPlatform()
+        testClassesDirs = sourceSets.integrationTest.output.classesDirs
+        classpath = sourceSets.integrationTest.runtimeClasspath
+    }
+
+    processIntegrationTestResources {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    repositories {
+        mavenCentral()
+        maven {
+            name = "Common-Libs"
+            url = uri("https://maven.pkg.github.com/dalayLama/playhub-common-libs")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+        maven {
+            name = "Test-Utils"
+            url = uri("https://maven.pkg.github.com/dalayLama/test-utils")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+
+        mavenLocal()
+    }
+
+    dependencyManagement {
+        dependencies {
+            imports {
+                mavenBom "org.springframework.boot:spring-boot-dependencies:$bomVersions.springBoot"
+                mavenBom "org.springframework.cloud:spring-cloud-dependencies:$bomVersions.springCloud"
+            }
+            dependency "org.mapstruct:mapstruct:$libVersions.mapstruct"
+            dependency "org.mapstruct:mapstruct-processor:$libVersions.mapstruct"
+            dependency "com.playhub.common:playhub-web-error-management-starter:$libVersions.playhubWebErrorManagementStarter"
+            dependency "com.playhub.common:playhub-common:$libVersions.playhubCommon"
+            dependency "com.playhub.common:playhub-logger-starter:$libVersions.playhubLoggerStarter"
+            dependency "com.playhub.common:playhub-rest-security:$libVersions.playhubSecurityStarter"
+            dependency "com.playhub.common:playhub-rest-security-starter:$libVersions.playhubSecurityStarter"
+            dependency "com.jimbeam:common-utils:$libVersions.jimBeamCommonUtils"
+            dependency "com.jimbeam:spring-jpa-utils:$libVersions.jimBeamJpaUtils"
+            dependency "com.jimbeam:postgres-testcontainer:$libVersions.jimBeamPostgresContainer"
+            dependency "com.jimbeam:kafka-testcontainer:$libVersions.jimBeamKafkaContainer"
+            dependency "com.jimbeam:spring-liquibase:$libVersions.jimBemSpringLiquibase"
+            dependency "org.springdoc:springdoc-openapi-starter-webmvc-ui:$libVersions.springDocOpenApi"
+        }
+    }
+
+    dependencies {
+        annotationProcessor 'org.projectlombok:lombok'
+        compileOnly 'org.projectlombok:lombok'
+
+        testFixturesAnnotationProcessor 'org.projectlombok:lombok'
+        testFixturesCompileOnly 'org.projectlombok:lombok'
+
+        testAnnotationProcessor 'org.projectlombok:lombok'
+        testCompileOnly 'org.projectlombok:lombok'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+        integrationTestAnnotationProcessor 'org.projectlombok:lombok'
+        integrationTestCompileOnly 'org.projectlombok:lombok'
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-parameters"
+        options.compilerArgs << "-Amapstruct.disableBuilders=true"
+    }
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
