@@ -1,6 +1,7 @@
 package com.playhub.game.boggle.manager.dao.entities;
 
 import com.playhub.game.boggle.manager.dao.converters.CharacterMatrixConverter;
+import com.playhub.game.boggle.manager.dao.converters.DurationToLongConverter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -61,7 +62,7 @@ public class RoundEntity {
     @Convert(converter = CharacterMatrixConverter.class)
     private List<List<Character>> charsMatrix;
 
-    @OneToMany(mappedBy = "round", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "id.round", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @Fetch(FetchMode.SUBSELECT)
     private List<RoundParticipantEntity> participants;
 
@@ -71,7 +72,7 @@ public class RoundEntity {
 
     @Column(name = "duration", nullable = false)
     @NotNull
-    @Convert(converter = DurationConverter.class)
+    @Convert(converter = DurationToLongConverter.class)
     private Duration duration;
 
     @Column(name = "created_at", nullable = false, updatable = false)
