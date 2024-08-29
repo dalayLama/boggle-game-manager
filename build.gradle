@@ -18,7 +18,7 @@ idea {
     }
 }
 
-group = 'com.playhub.boggle'
+group = 'com.playhub.game.boggle.manager'
 version = '0.0.1-SNAPSHOT'
 
 ext {
@@ -58,6 +58,27 @@ subprojects {
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'idea'
     apply plugin: 'java-test-fixtures'
+
+    repositories {
+        mavenCentral()
+        maven {
+            name = "Common-Libs"
+            url = uri("https://maven.pkg.github.com/dalayLama/playhub-common-libs")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+        maven {
+            name = "Test-Utils"
+            url = uri("https://maven.pkg.github.com/dalayLama/test-utils")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+        mavenLocal()
+    }
 
     sourceSets {
         integrationTest {
@@ -120,6 +141,7 @@ subprojects {
             }
             dependency "org.mapstruct:mapstruct:$libVersions.mapstruct"
             dependency "org.mapstruct:mapstruct-processor:$libVersions.mapstruct"
+            dependency "org.mapstruct:mapstruct-processor:$libVersions.mapstruct"
             dependency "com.playhub.common:playhub-web-error-management-starter:$libVersions.playhubWebErrorManagementStarter"
             dependency "com.playhub.common:playhub-common:$libVersions.playhubCommon"
             dependency "com.playhub.common:playhub-logger-starter:$libVersions.playhubLoggerStarter"
@@ -155,8 +177,9 @@ subprojects {
         options.compilerArgs << "-Amapstruct.disableBuilders=true"
     }
 
-}
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
 
-tasks.named('test') {
-    useJUnitPlatform()
+
 }
