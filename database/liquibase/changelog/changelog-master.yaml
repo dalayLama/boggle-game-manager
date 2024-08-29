@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - include:
+      file: v1_create_games_table.sql
+      relativeToChangelogFile: true
+  - include:
+      file: v2_create_rounds_table.sql
+      relativeToChangelogFile: true
+  - include:
+      file: v3_create_round_participants_table.sql
+      relativeToChangelogFile: true
+  - include:
+      file: v4_create_participant_answers_table.sql
+      relativeToChangelogFile: true

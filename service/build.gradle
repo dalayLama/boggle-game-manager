@@ -1,22 +1,21 @@
-group = 'com.playhub.boggle'
+group = 'com.playhub.game.boggle.manager'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
-    annotationProcessor 'org.mapstruct:mapstruct-processor'
+    implementation project(':rest-dto')
+    implementation project(':kafka-dto')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
+    implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.postgresql:postgresql'
     implementation 'org.mapstruct:mapstruct'
-    implementation 'com.playhub.common:playhub-logger-starter'
-    implementation 'com.playhub.common:playhub-rest-security-starter'
-    implementation 'com.playhub.common:playhub-web-error-management-starter'
-    implementation project(':rest-dto')
-    implementation project(':kafka-dto')
-    implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.apache.commons:commons-lang3'
+    implementation 'com.playhub.common:playhub-logger-starter'
+    implementation 'com.playhub.common:playhub-web-error-management-starter'
+    annotationProcessor 'org.mapstruct:mapstruct-processor'
 
     testImplementation 'com.jimbeam:common-utils'
 
@@ -27,11 +26,11 @@ dependencies {
     integrationTestImplementation 'com.jimbeam:kafka-testcontainer'
     integrationTestImplementation 'com.jimbeam:spring-liquibase'
 
+    testFixturesImplementation project(':rest-dto')
+    testFixturesImplementation project(':kafka-dto')
     testFixturesImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     testFixturesImplementation 'com.fasterxml.jackson.core:jackson-core'
     testFixturesImplementation 'com.fasterxml.jackson.core:jackson-databind'
     testFixturesImplementation 'com.fasterxml.jackson.core:jackson-annotations'
     testFixturesImplementation 'com.jimbeam:common-utils'
-    testFixturesImplementation project(':rest-dto')
-    testFixturesImplementation project(':kafka-dto')
 }
