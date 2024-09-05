@@ -6,8 +6,8 @@ databaseChangeLog:
       file: v2_create_rounds_table.sql
       relativeToChangelogFile: true
   - include:
-      file: v3_create_round_participants_table.sql
+      file: v3_create_round_players_table.sql
       relativeToChangelogFile: true
   - include:
-      file: v4_create_participant_answers_table.sql
+      file: v4_create_player_answers_table.sql
       relativeToChangelogFile: true
