@@ -172,14 +172,12 @@ subprojects {
         integrationTestCompileOnly 'org.projectlombok:lombok'
     }
 
-    tasks.withType(JavaCompile) {
-        options.compilerArgs << "-parameters"
-        options.compilerArgs << "-Amapstruct.disableBuilders=true"
-    }
-
     tasks.named('test') {
         useJUnitPlatform()
     }
 
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-parameters"
+    }
 
 }

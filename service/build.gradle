@@ -34,3 +34,7 @@ dependencies {
     testFixturesImplementation 'com.fasterxml.jackson.core:jackson-annotations'
     testFixturesImplementation 'com.jimbeam:common-utils'
 }
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Amapstruct.disableBuilders=true"
+}
