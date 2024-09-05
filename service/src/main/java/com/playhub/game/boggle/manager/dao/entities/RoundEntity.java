@@ -1,7 +1,7 @@
 package com.playhub.game.boggle.manager.dao.entities;
 
 import com.playhub.game.boggle.manager.dao.converters.CharacterMatrixConverter;
-import com.playhub.game.boggle.manager.dao.converters.DurationToLongConverter;
+import com.playhub.game.boggle.manager.models.BoggleBoard;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -17,7 +17,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import com.playhub.game.boggle.manager.models.RoundState;
-import javafx.css.converter.DurationConverter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,9 +29,11 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.SourceType;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "rounds")
@@ -41,8 +42,28 @@ import java.util.List;
 @Getter
 @Setter
 @Builder(toBuilder = true)
-@ToString(exclude = {"game", "participants"})
+@ToString(exclude = {"game", "players"})
 public class RoundEntity {
+
+    public static RoundEntity newRound(int number, BoggleBoard board, Set<UUID> players) {
+        RoundEntity round = RoundEntity.builder()
+                .id(null)
+                .game(null)
+                .number(number)
+                .board(board)
+                .players(new ArrayList<>())
+                .state(RoundState.WAITING)
+                .createdAt(null)
+                .startedAt(null)
+                .finishedAt(null)
+                .build();
+
+        players.forEach(id -> {
+            RoundPlayerEntity player = RoundPlayerEntity.newRoundPlayer(id);
+            round.addPlayer(player);
+        });
+        return round;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,23 +78,18 @@ public class RoundEntity {
     @Min(1L)
     private int number;
 
-    @Column(name = "chars_matrix", nullable = false, updatable = false)
+    @Column(name = "board", nullable = false, updatable = false)
     @NotNull
     @Convert(converter = CharacterMatrixConverter.class)
-    private List<List<Character>> charsMatrix;
+    private BoggleBoard board;
 
     @OneToMany(mappedBy = "id.round", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @Fetch(FetchMode.SUBSELECT)
-    private List<RoundParticipantEntity> participants;
+    private List<RoundPlayerEntity> players;
 
     @Column(name = "state", nullable = false)
     @NotNull
     private RoundState state;
-
-    @Column(name = "duration", nullable = false)
-    @NotNull
-    @Convert(converter = DurationToLongConverter.class)
-    private Duration duration;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp(source = SourceType.VM)
@@ -86,4 +102,8 @@ public class RoundEntity {
     @Column(name = "finished_at")
     private Instant finishedAt;
 
+    public void addPlayer(RoundPlayerEntity player) {
+        player.setRound(this);
+        players.add(player);
+    }
 }

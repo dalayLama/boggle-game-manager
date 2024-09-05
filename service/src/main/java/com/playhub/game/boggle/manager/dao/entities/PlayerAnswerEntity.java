@@ -24,19 +24,19 @@ import org.hibernate.annotations.SourceType;
 import java.time.Instant;
 
 @Entity
-@Table(name = "participant_answers")
+@Table(name = "player_answers")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder(toBuilder = true)
-@ToString(exclude = {"participant"})
-public class RoundAnswerEntity {
+@ToString(exclude = {"player"})
+public class PlayerAnswerEntity {
 
-    public static RoundAnswerEntity newAnswer(String answer) {
-        return RoundAnswerEntity.builder()
+    public static PlayerAnswerEntity newAnswer(String answer) {
+        return PlayerAnswerEntity.builder()
                 .id(null)
-                .participant(null)
+                .player(null)
                 .answer(answer)
                 .createdAt(null)
                 .build();
@@ -49,9 +49,9 @@ public class RoundAnswerEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "round_id", referencedColumnName = "round_id"),
-            @JoinColumn(name = "participant_id", referencedColumnName = "participant_id")
+            @JoinColumn(name = "player_id", referencedColumnName = "player_id")
     })
-    private RoundParticipantEntity participant;
+    private RoundPlayerEntity player;
 
     @Column(name = "answer", nullable = false, updatable = false)
     @NotNull
