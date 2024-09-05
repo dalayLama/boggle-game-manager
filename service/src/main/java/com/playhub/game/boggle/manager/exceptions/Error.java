@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatusCode;
 @Getter
 public enum Error {
 
-    LETTERS_DICTIONARY_NOT_FOUND_BY_LOCALE(HttpStatus.NOT_FOUND);
+    LETTERS_DICTIONARY_NOT_FOUND_BY_LOCALE,
+    PLAYERS_ALREADY_ASSIGNED;
 
     private final String titleCode;
 
@@ -16,7 +17,7 @@ public enum Error {
 
     private final String code;
 
-    Error(HttpStatusCode statusCode) {
+    Error() {
         this.code = name();
         this.titleCode = titleCode(name().toLowerCase());
         this.messageCode = messageCode(name().toLowerCase());
