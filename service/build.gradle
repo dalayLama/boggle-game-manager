@@ -2,7 +2,7 @@ group = 'com.playhub.game.boggle.manager'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
-    implementation project(':rest-dto')
+    implementation project(':rest-common')
     implementation project(':kafka-dto')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -13,6 +13,7 @@ dependencies {
     implementation 'org.postgresql:postgresql'
     implementation 'org.mapstruct:mapstruct'
     implementation 'org.apache.commons:commons-lang3'
+    implementation 'com.playhub.common:playhub-rest-security-starter'
     implementation 'com.playhub.common:playhub-logger-starter'
     implementation 'com.playhub.common:playhub-web-error-management-starter'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
@@ -26,7 +27,7 @@ dependencies {
     integrationTestImplementation 'com.jimbeam:kafka-testcontainer'
     integrationTestImplementation 'com.jimbeam:spring-liquibase'
 
-    testFixturesImplementation project(':rest-dto')
+    testFixturesImplementation project(':rest-common')
     testFixturesImplementation project(':kafka-dto')
     testFixturesImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     testFixturesImplementation 'com.fasterxml.jackson.core:jackson-core'
