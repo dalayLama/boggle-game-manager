@@ -9,6 +9,7 @@ dependencies {
     implementation 'org.springframework:spring-web'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.playhub.common:playhub-common'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
 }
 
 publishing {
