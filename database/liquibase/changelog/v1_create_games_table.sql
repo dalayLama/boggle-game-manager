@@ -13,7 +13,7 @@ create table public.games
     rounds_duration bigint                    not null,
     state           varchar(10)               not null,
     created_at      timestamptz default now() not null,
-    started_at      timestamptz default now() not null,
+    started_at      timestamptz,
     finished_at     timestamptz
 );
 

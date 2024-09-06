@@ -76,16 +76,15 @@ public class GameEntity {
     private List<RoundEntity> rounds = new ArrayList<>();
 
     @Column(name = "state", nullable = false)
-    @NotNull
     @Enumerated(EnumType.STRING)
+    @NotNull
     private GameState state;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp(source = SourceType.VM)
     private Instant createdAt;
 
-    @Column(name = "started_at", nullable = false)
-    @UpdateTimestamp(source = SourceType.VM)
+    @Column(name = "started_at")
     private Instant startedAt;
 
     @Column(name = "finished_at", nullable = false, updatable = false)

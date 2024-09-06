@@ -6,6 +6,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -88,6 +90,7 @@ public class RoundEntity {
     private List<RoundPlayerEntity> players;
 
     @Column(name = "state", nullable = false)
+    @Enumerated(EnumType.STRING)
     @NotNull
     private RoundState state;
 
@@ -95,8 +98,7 @@ public class RoundEntity {
     @CreationTimestamp(source = SourceType.VM)
     private Instant createdAt;
 
-    @Column(name = "started_at", nullable = false)
-    @UpdateTimestamp(source = SourceType.VM)
+    @Column(name = "started_at")
     private Instant startedAt;
 
     @Column(name = "finished_at")
