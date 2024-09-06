@@ -111,28 +111,6 @@ subprojects {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 
-    repositories {
-        mavenCentral()
-        maven {
-            name = "Common-Libs"
-            url = uri("https://maven.pkg.github.com/dalayLama/playhub-common-libs")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
-            }
-        }
-        maven {
-            name = "Test-Utils"
-            url = uri("https://maven.pkg.github.com/dalayLama/test-utils")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
-            }
-        }
-
-        mavenLocal()
-    }
-
     dependencyManagement {
         dependencies {
             imports {
@@ -172,14 +150,12 @@ subprojects {
         integrationTestCompileOnly 'org.projectlombok:lombok'
     }
 
-    tasks.withType(JavaCompile) {
-        options.compilerArgs << "-parameters"
-        options.compilerArgs << "-Amapstruct.disableBuilders=true"
-    }
-
     tasks.named('test') {
         useJUnitPlatform()
     }
 
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-parameters"
+    }
 
 }

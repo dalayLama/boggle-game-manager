@@ -1,5 +1,5 @@
 rootProject.name = 'boggle-game-manager'
 include 'service'
-include 'rest-dto'
+include 'rest-common'
 include 'kafka-dto'
 

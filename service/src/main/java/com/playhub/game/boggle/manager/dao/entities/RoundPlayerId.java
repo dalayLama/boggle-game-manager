@@ -23,15 +23,15 @@ import java.util.UUID;
 @Setter
 @Builder(toBuilder = true)
 @ToString(exclude = {"round"})
-public class RoundParticipantId implements Serializable {
+public class RoundPlayerId implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "round_id", nullable = false, updatable = false)
     @NotNull
     private RoundEntity round;
 
-    @Column(name = "participant_id", nullable = false, updatable = false)
+    @Column(name = "player_id", nullable = false, updatable = false)
     @NotNull
-    private UUID participantId;
+    private UUID playerId;
 
 }
