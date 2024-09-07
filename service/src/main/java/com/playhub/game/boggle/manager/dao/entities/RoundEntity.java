@@ -1,10 +1,9 @@
 package com.playhub.game.boggle.manager.dao.entities;
 
-import com.playhub.game.boggle.manager.dao.converters.CharacterMatrixConverter;
+import com.playhub.game.boggle.manager.dao.converters.BoggleBoardType;
 import com.playhub.game.boggle.manager.models.BoggleBoard;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -29,7 +28,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.SourceType;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Type;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -82,7 +81,7 @@ public class RoundEntity {
 
     @Column(name = "board", nullable = false, updatable = false)
     @NotNull
-    @Convert(converter = CharacterMatrixConverter.class)
+    @Type(BoggleBoardType.class)
     private BoggleBoard board;
 
     @OneToMany(mappedBy = "id.round", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -108,4 +107,5 @@ public class RoundEntity {
         player.setRound(this);
         players.add(player);
     }
+
 }

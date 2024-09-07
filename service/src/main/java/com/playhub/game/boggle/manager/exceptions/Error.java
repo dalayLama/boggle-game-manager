@@ -1,7 +1,6 @@
 package com.playhub.game.boggle.manager.exceptions;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 
@@ -9,7 +8,13 @@ import org.springframework.http.HttpStatusCode;
 public enum Error {
 
     LETTERS_DICTIONARY_NOT_FOUND_BY_LOCALE,
-    PLAYERS_ALREADY_ASSIGNED;
+    PLAYERS_ALREADY_ASSIGNED,
+    GAME_NOT_FOUND,
+    GAME_NOT_FOUND_BY_ID(GAME_NOT_FOUND, "id"),
+    INVALID_GAME_STATE,
+    GAME_HAS_ACTIVE_ROUND,
+    AVAILABLE_ROUND_NOT_FOUND,
+    ROUND_NOT_HAVE_ENOUGH_PLAYERS;
 
     private final String titleCode;
 

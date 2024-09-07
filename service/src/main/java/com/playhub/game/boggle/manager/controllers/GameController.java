@@ -2,9 +2,11 @@ package com.playhub.game.boggle.manager.controllers;
 
 import com.playhub.game.boggle.manager.dto.GameDto;
 import com.playhub.game.boggle.manager.dto.NewGameRequestDto;
+import com.playhub.game.boggle.manager.dto.RoundDto;
 import com.playhub.game.boggle.manager.mappers.GameDtoMapper;
 import com.playhub.game.boggle.manager.models.Game;
 import com.playhub.game.boggle.manager.models.NewGameRequest;
+import com.playhub.game.boggle.manager.models.Round;
 import com.playhub.game.boggle.manager.rest.ApiPaths;
 import com.playhub.game.boggle.manager.services.GameService;
 import com.playhub.security.rest.PlayHubUser;
@@ -12,12 +14,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +41,13 @@ public class GameController {
                 .path("/{id}").buildAndExpand(gameDto.id())
                 .toUri();
         return ResponseEntity.created(uri).body(gameDto);
+    }
+
+    @PostMapping(ApiPaths.V1_NEXT_ROUND)
+    public ResponseEntity<RoundDto> nextRound(@PathVariable(name = "gameId") UUID gameId) {
+        Round round = gameService.startNextRound(gameId);
+        RoundDto dto = mapper.toRoundDto(round);
+        return ResponseEntity.ok(dto);
     }
 
 }
