@@ -45,6 +45,12 @@ public class RoundEntityTestBuilder implements TestObjectBuilder<RoundEntity> {
                 .withGame(game);
     }
 
+    public static RoundEntityTestBuilder aNewRound(GameEntity game) {
+        return aWaiting()
+                .withId(null)
+                .withGame(game);
+    }
+
     @Override
     public RoundEntity build() {
         RoundEntity round = new RoundEntity(id, game, number, board, players, state, createdAt, startedAt, finishedAt);

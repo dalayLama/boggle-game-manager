@@ -6,6 +6,8 @@ import com.playhub.common.errors.managment.PlayHubErrorCodes;
 import com.playhub.game.boggle.manager.App;
 import com.playhub.game.boggle.manager.consts.LocaleConsts;
 import com.playhub.game.boggle.manager.dto.GameStateDto;
+import com.playhub.game.boggle.manager.dto.RoundStateDto;
+import com.playhub.game.boggle.manager.exceptions.Error;
 import com.playhub.game.boggle.manager.rest.ApiPaths;
 import com.playhub.game.boggle.manager.test.user.UserInfo;
 import com.playhub.game.boggle.manager.test.user.UserInfoUtils;
@@ -18,13 +20,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Duration;
 import java.util.Locale;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,6 +46,7 @@ public class GameControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
+    @Sql(scripts = "/sql/clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void shouldCreateGame() throws Exception {
         UserInfo userInfo = UserInfoUtils.getUserInfo();
         UUID roomId = UUID.fromString("1fa0786b-25ec-4b26-b94c-b4fc5ec5a010");
@@ -67,7 +73,7 @@ public class GameControllerIntegrationTest {
                 .andExpect(jsonPath("$.locale").value(locale.toLanguageTag()))
                 .andExpect(jsonPath("$.state").value(GameStateDto.WAITING.name()))
                 .andExpect(jsonPath("$.createdAt").isNotEmpty())
-                .andExpect(jsonPath("$.startedAt").isNotEmpty())
+                .andExpect(jsonPath("$.startedAt").isEmpty())
                 .andExpect(jsonPath("$.finishedAt").isEmpty())
                 .andDo(print());
     }
@@ -125,6 +131,80 @@ public class GameControllerIntegrationTest {
                                 """
                         ))
                 .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @Sql(scripts = "/sql/created-game.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void shouldStartNextRound() throws Exception {
+        UserInfo userInfo = UserInfoUtils.getUserInfo();
+        UUID gameId = UUID.fromString("8e5a5e37-6c7e-4cc3-a010-7458db3e80bf");
+
+        String[] expectedPlayers = {userInfo.id().toString(), "0d57d4cd-8218-4ac8-950a-1d876d0f0293"};
+
+        mockMvc.perform(post(ApiPaths.V1_NEXT_ROUND, gameId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userInfo.jwtToken())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.gameId").value(gameId.toString()))
+                .andExpect(jsonPath("$.number").value(1))
+                .andExpect(jsonPath("$.board", contains(
+                        contains("A", "B"),
+                        contains("C", "V"),
+                        contains("A", "B"),
+                        contains("C", "V")
+                )))
+                .andExpect(jsonPath("$.players", contains(expectedPlayers)))
+                .andExpect(jsonPath("$.state").value(RoundStateDto.PLAYING.name()))
+                .andExpect(jsonPath("$.createdAt").isNotEmpty())
+                .andExpect(jsonPath("$.startedAt").isNotEmpty())
+                .andExpect(jsonPath("$.finishedAt").isEmpty())
+                .andDo(print());
+    }
+
+    @Test
+    @Sql(scripts = "/sql/finished-game.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void shouldReturn403WhenStartingNextRound_ifGameIsFinished() throws Exception {
+        UserInfo userInfo = UserInfoUtils.getUserInfo();
+        UUID gameId = UUID.fromString("8e5a5e37-6c7e-4cc3-a010-7458db3e80bf");
+
+        mockMvc.perform(post(ApiPaths.V1_NEXT_ROUND, gameId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userInfo.jwtToken())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.errorCode").value(Error.INVALID_GAME_STATE.name()))
+                .andDo(print());
+    }
+
+    @Test
+    @Sql(scripts = "/sql/game-with-active-round.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void shouldReturn409WhenStartingNextRound_ifGameHasAnActiveRound() throws Exception {
+        UserInfo userInfo = UserInfoUtils.getUserInfo();
+        UUID gameId = UUID.fromString("8e5a5e37-6c7e-4cc3-a010-7458db3e80bf");
+
+        mockMvc.perform(post(ApiPaths.V1_NEXT_ROUND, gameId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userInfo.jwtToken())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.errorCode").value(Error.GAME_HAS_ACTIVE_ROUND.name()))
+                .andDo(print());
+    }
+
+    @Test
+    @Sql(scripts = "/sql/game-with-not-enough-players-in-round.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void shouldReturn403WhenStartingNextRound_ifGameRoundDoesNotHaveEnoughPlayers() throws Exception {
+        UserInfo userInfo = UserInfoUtils.getUserInfo();
+        UUID gameId = UUID.fromString("8e5a5e37-6c7e-4cc3-a010-7458db3e80bf");
+
+        mockMvc.perform(post(ApiPaths.V1_NEXT_ROUND, gameId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userInfo.jwtToken())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.errorCode").value(Error.ROUND_NOT_HAVE_ENOUGH_PLAYERS.name()))
                 .andDo(print());
     }
 

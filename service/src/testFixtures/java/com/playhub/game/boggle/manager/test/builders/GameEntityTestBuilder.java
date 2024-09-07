@@ -40,7 +40,7 @@ public class GameEntityTestBuilder implements TestObjectBuilder<GameEntity> {
 
     private Instant createdAt = Instant.now();
 
-    private Instant startedAt = Instant.now();
+    private Instant startedAt = null;
 
     private Instant finishedAt = null;
 
@@ -56,6 +56,13 @@ public class GameEntityTestBuilder implements TestObjectBuilder<GameEntity> {
                 .withCreatedAt(null)
                 .withStartedAt(null)
                 .withFinishedAt(null);
+    }
+
+    public static GameEntityTestBuilder aNewGame() {
+        return aWaiting()
+                .withId(null)
+                .withCreatedAt(null);
+
     }
 
     @Override
