@@ -15,7 +15,9 @@ import com.playhub.game.boggle.manager.models.GameState;
 import com.playhub.game.boggle.manager.models.NewGameRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -65,6 +67,21 @@ public class DaoGameService implements GameService {
         }
 
         return roundService.startNextRound(gameId);
+    }
+
+    @Transactional
+    @Override
+    public void addAnswer(@NotNull UUID gameId,
+                          @Positive int roundNumber,
+                          @NotNull UUID playerId,
+                          @NotEmpty String answer) {
+        GameEntity game = getGameById(gameRepository::findById, gameId);
+        if (!game.getState().isPlayable()) {
+            String message = "Can't accept answer for the game(%s) with state %s".formatted(gameId, game.getState());
+            throw new InvalidGameStateException(message, gameId, game.getState());
+        }
+
+        roundService.addAnswer(gameId, roundNumber, playerId, answer);
     }
 
     private void changeStateToPlaying(GameEntity game) {

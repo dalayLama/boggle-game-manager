@@ -208,4 +208,88 @@ public class GameControllerIntegrationTest {
                 .andDo(print());
     }
 
+    @Test
+    @Sql(scripts = "/sql/game-with-active-round.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void shouldAcceptAnswer() throws Exception {
+        UserInfo userInfo = UserInfoUtils.getUserInfo();
+        UUID gameId = UUID.fromString("8e5a5e37-6c7e-4cc3-a010-7458db3e80bf");
+        int roundNumber = 1;
+
+        mockMvc.perform(post(ApiPaths.V1_ADD_ANSWER, gameId, roundNumber)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userInfo.jwtToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "answer": "test"
+                                }
+                                """))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    @Sql(scripts = "/sql/game-with-active-round.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void shouldReturn400WhenAcceptingAnswer_IfAnswerIsEmpty() throws Exception {
+        UserInfo userInfo = UserInfoUtils.getUserInfo();
+        UUID gameId = UUID.fromString("8e5a5e37-6c7e-4cc3-a010-7458db3e80bf");
+        int roundNumber = 1;
+
+        mockMvc.perform(post(ApiPaths.V1_ADD_ANSWER, gameId, roundNumber)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userInfo.jwtToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "answer": null
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.validationDetails.answer", contains("must not be blank")))
+                .andExpect(jsonPath("$.errorCode").value(PlayHubErrorCodes.VALIDATION_ERROR_CODE))
+                .andDo(print());
+    }
+
+    @Test
+    @Sql(scripts = "/sql/finished-game.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void shouldReturn403WhenAcceptingAnswer_IfGameIsFinished() throws Exception {
+        UserInfo userInfo = UserInfoUtils.getUserInfo();
+        UUID gameId = UUID.fromString("8e5a5e37-6c7e-4cc3-a010-7458db3e80bf");
+        int roundNumber = 1;
+
+        mockMvc.perform(post(ApiPaths.V1_ADD_ANSWER, gameId, roundNumber)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userInfo.jwtToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "answer": "test"
+                                }
+                                """))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.errorCode").value(Error.INVALID_GAME_STATE.name()))
+                .andDo(print());
+    }
+
+    @Test
+    @Sql(scripts = "/sql/game-with-finished-round.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/clear.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void shouldReturn403WhenAcceptingAnswer_IfRoundIsFinished() throws Exception {
+        UserInfo userInfo = UserInfoUtils.getUserInfo();
+        UUID gameId = UUID.fromString("8e5a5e37-6c7e-4cc3-a010-7458db3e80bf");
+        int roundNumber = 1;
+
+        mockMvc.perform(post(ApiPaths.V1_ADD_ANSWER, gameId, roundNumber)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userInfo.jwtToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "answer": "test"
+                                }
+                                """))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.errorCode").value(Error.INVALID_ROUND_STATE.name()))
+                .andDo(print());
+    }
+
 }

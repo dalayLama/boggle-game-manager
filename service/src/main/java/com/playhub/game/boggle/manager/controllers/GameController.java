@@ -2,6 +2,7 @@ package com.playhub.game.boggle.manager.controllers;
 
 import com.playhub.game.boggle.manager.dto.GameDto;
 import com.playhub.game.boggle.manager.dto.NewGameRequestDto;
+import com.playhub.game.boggle.manager.dto.RoundAnswerDto;
 import com.playhub.game.boggle.manager.dto.RoundDto;
 import com.playhub.game.boggle.manager.mappers.GameDtoMapper;
 import com.playhub.game.boggle.manager.models.Game;
@@ -48,6 +49,15 @@ public class GameController {
         Round round = gameService.startNextRound(gameId);
         RoundDto dto = mapper.toRoundDto(round);
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping(ApiPaths.V1_ADD_ANSWER)
+    public ResponseEntity<Void> addAnswer(@AuthenticationPrincipal PlayHubUser user,
+                                          @PathVariable("gameId") UUID gameId,
+                                          @PathVariable("roundNumber") int roundNumber,
+                                          @RequestBody @Valid RoundAnswerDto dto) {
+        gameService.addAnswer(gameId, roundNumber, user.getId(), dto.answer());
+        return ResponseEntity.noContent().build();
     }
 
 }
