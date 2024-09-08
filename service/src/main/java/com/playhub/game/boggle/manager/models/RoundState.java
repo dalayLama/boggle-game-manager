@@ -12,9 +12,9 @@ public enum RoundState {
 
     WAITING(true), PLAYING(true, true), CANCELED(false), FINISHED(false);
 
-    public static Set<GameState> getActiveStates() {
-        return Arrays.stream(GameState.values())
-                .filter(GameState::isActive)
+    public static Set<RoundState> getActiveStates() {
+        return Arrays.stream(RoundState.values())
+                .filter(RoundState::isActive)
                 .collect(Collectors.toSet());
     }
 

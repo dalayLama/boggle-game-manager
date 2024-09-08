@@ -60,4 +60,10 @@ public class GameController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping(ApiPaths.V1_CANCEL_GAME)
+    public ResponseEntity<Void> cancelGame(@PathVariable("gameId") UUID gameId) {
+        gameService.cancelGame(gameId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

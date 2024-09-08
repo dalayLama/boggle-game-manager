@@ -15,4 +15,6 @@ public interface RoundService {
                    @Positive int roundNumber,
                    @NotNull UUID playerId,
                    @NotEmpty String answer);
+
+    void cancelRounds(@NotNull UUID gameId);
 }
