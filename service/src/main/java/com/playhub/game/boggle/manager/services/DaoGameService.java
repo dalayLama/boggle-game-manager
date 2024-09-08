@@ -84,9 +84,27 @@ public class DaoGameService implements GameService {
         roundService.addAnswer(gameId, roundNumber, playerId, answer);
     }
 
+    @Transactional
+    @Override
+    public void cancelGame(@NotNull UUID gameId) {
+        GameEntity game = getGameById(gameRepository::pessimisticWrite, gameId);
+        if (!game.getState().isActive()) {
+            String message = "Can't cancel game(%s) with state %s".formatted(gameId, game.getState());
+            throw new InvalidGameStateException(message, gameId, game.getState());
+        }
+        roundService.cancelRounds(gameId);
+        changeStateToCancel(game);
+        gameRepository.saveAndFlush(game);
+    }
+
     private void changeStateToPlaying(GameEntity game) {
         game.setState(GameState.PLAYING);
         game.setStartedAt(Instant.now());
+    }
+
+    private void changeStateToCancel(GameEntity game) {
+        game.setState(GameState.CANCELED);
+        game.setFinishedAt(Instant.now());
     }
 
     private List<RoundEntity> createRounds(NewGameRequest request, Set<UUID> players) {

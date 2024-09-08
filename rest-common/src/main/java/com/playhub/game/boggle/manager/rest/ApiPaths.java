@@ -12,4 +12,7 @@ public class ApiPaths {
     public static final String V1_NEXT_ROUND = V1 + "/games/{gameId}/next-round";
 
     public static final String V1_ADD_ANSWER = V1 + "/games/{gameId}/rounds/{roundNumber}/answers";
+
+    public static final String V1_CANCEL_GAME = V1 + "/games/{gameId}/cancel";
+
 }

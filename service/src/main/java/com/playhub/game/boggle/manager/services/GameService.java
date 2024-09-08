@@ -20,4 +20,6 @@ public interface GameService {
                    @Positive int roundNumber,
                    @NotNull UUID playerId,
                    @NotEmpty String answer);
+
+    void cancelGame(@NotNull UUID gameId);
 }

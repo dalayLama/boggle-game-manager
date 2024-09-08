@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -61,6 +62,17 @@ public class DaoRoundService implements RoundService {
         playerService.addAnswer(round.getId(), playerId, answer);
     }
 
+    @Transactional
+    @Override
+    public void cancelRounds(@NotNull UUID gameId) {
+        List<RoundEntity> rounds = roundRepository.findRoundsAndBlock(gameId, RoundState.getActiveStates());
+        if (rounds.isEmpty()) {
+            return;
+        }
+        rounds.forEach(this::changeStateToCancel);
+        roundRepository.saveAllAndFlush(rounds);
+    }
+
     private void checkRoundHasEnoughParticipants(RoundEntity round) {
         if (round.getPlayers().size() < 2) {
             throw new RoundNotHaveEnoughPlayers(round.getGame().getId(), round.getId());
@@ -70,6 +82,11 @@ public class DaoRoundService implements RoundService {
     private void changeStateToPlaying(RoundEntity round) {
         round.setState(RoundState.PLAYING);
         round.setStartedAt(Instant.now());
+    }
+
+    private void changeStateToCancel(RoundEntity round) {
+        round.setState(RoundState.CANCELED);
+        round.setFinishedAt(Instant.now());
     }
 
 }
