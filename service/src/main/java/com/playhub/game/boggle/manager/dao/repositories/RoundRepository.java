@@ -19,6 +19,10 @@ public interface RoundRepository extends JpaRepository<RoundEntity, Long> {
             + " FOR NO KEY UPDATE", nativeQuery = true)
     Optional<RoundEntity> findAndBlockFirstWaitingRound(@NotNull @Param("gameId") UUID gameId);
 
+    @Query("SELECT r FROM RoundEntity r WHERE r.game.id = :gameId AND r.number = :number")
+    Optional<RoundEntity> findRoundByNumber(@NotNull @Param("gameId") UUID gameId,
+                                            @NotNull @Param("number") int number);
+
     @Query("SELECT count(r.id) > 0 FROM RoundEntity r WHERE r.game.id = :gameId AND r.state = 'PLAYING'")
     boolean gameHasActiveRound(@NotNull @Param("gameId") UUID gameId);
 
