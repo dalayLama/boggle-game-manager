@@ -15,7 +15,7 @@ public class InvalidRoundStateException extends BoggleGameManagerException {
     private final RoundState roundState;
 
     public InvalidRoundStateException(String message, UUID gameId, Long id, RoundState state) {
-        super(message, Error.INVALID_GAME_STATE);
+        super(message, Error.INVALID_ROUND_STATE);
         this.gameId = gameId;
         this.roundId = id;
         this.roundState = state;

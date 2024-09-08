@@ -70,6 +70,7 @@ public class DaoGameService implements GameService {
     }
 
     @Transactional
+    @Override
     public void addAnswer(@NotNull UUID gameId,
                           @Positive int roundNumber,
                           @NotNull UUID playerId,

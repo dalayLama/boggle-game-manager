@@ -16,7 +16,8 @@ public enum Error {
     AVAILABLE_ROUND_NOT_FOUND,
     ROUND_NOT_HAVE_ENOUGH_PLAYERS,
     PLAYER_NOT_FOUND,
-    ROUND_NOT_FOUND_BY_NUMBER;
+    ROUND_NOT_FOUND_BY_NUMBER,
+    INVALID_ROUND_STATE;
 
     private final String titleCode;
 
