@@ -87,7 +87,7 @@ public class GameEntity {
     @Column(name = "started_at")
     private Instant startedAt;
 
-    @Column(name = "finished_at", nullable = false, updatable = false)
+    @Column(name = "finished_at", nullable = false)
     private Instant finishedAt;
 
     public void addRound(RoundEntity round) {
